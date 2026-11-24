@@ -50,8 +50,11 @@ export class SceneManager {
     this.scene.background = new THREE.Color(0xf6f4ef);
 
     // 2. Camera Setup
-    const aspect = this.container.clientWidth / this.container.clientHeight;
-    this.camera = new THREE.PerspectiveCamera(43, aspect, 0.1, 100);
+    const width = this.container.clientWidth;
+    const height = this.container.clientHeight;
+    const aspect = width / height;
+    const isMobileLandscape = height < 520 || (aspect > 1.85 && height < 650);
+    this.camera = new THREE.PerspectiveCamera(isMobileLandscape ? 53 : 43, aspect, 0.1, 100);
     this.camera.position.copy(this.cameraCurrentPos);
     this.camera.lookAt(this.cameraCurrentLookAt);
 
@@ -155,7 +158,16 @@ export class SceneManager {
     if (!this.container) return;
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-    this.camera.aspect = width / height;
+    const aspect = width / height;
+
+    // Adjust vertical FOV dynamically on mobile landscape
+    if (height < 520 || (aspect > 1.85 && height < 650)) {
+      this.camera.fov = 53;
+    } else {
+      this.camera.fov = 43;
+    }
+
+    this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   }

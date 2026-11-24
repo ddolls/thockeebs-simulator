@@ -244,10 +244,19 @@ class GameApp {
         const showWbTab = document.getElementById('show-workbench-tab');
         const showBpTab = document.getElementById('show-blueprint-tab');
 
-        if (wbPanel) wbPanel.classList.remove('collapsed');
-        if (bpPanel) bpPanel.classList.remove('collapsed');
-        if (showWbTab) showWbTab.style.display = 'none';
-        if (showBpTab) showBpTab.style.display = 'none';
+        const isMobile = window.innerWidth < 950 || window.innerHeight < 550;
+        if (isMobile) {
+          // On mobile, show Workbench and keep Blueprint collapsed to give maximum room to 3D keyboard
+          if (wbPanel) wbPanel.classList.remove('collapsed');
+          if (bpPanel) bpPanel.classList.add('collapsed');
+          if (showWbTab) showWbTab.style.display = 'none';
+          if (showBpTab) showBpTab.style.display = 'flex';
+        } else {
+          if (wbPanel) wbPanel.classList.remove('collapsed');
+          if (bpPanel) bpPanel.classList.remove('collapsed');
+          if (showWbTab) showWbTab.style.display = 'none';
+          if (showBpTab) showBpTab.style.display = 'none';
+        }
 
         const req = this.currentCustomer ? (this.currentCustomer.specs || {}) : {};
         if (this.currentCustomer.orderType === 'mod_service' && this.currentCustomer.initialKeyboardSpecs) {
@@ -284,6 +293,13 @@ class GameApp {
       showWbTab.addEventListener('click', () => {
         wbPanel.classList.remove('collapsed');
         showWbTab.style.display = 'none';
+        // On mobile, collapse blueprint when workbench opens so center 3D scene isn't squeezed
+        if (window.innerWidth < 950 || window.innerHeight < 550) {
+          if (bpPanel) {
+            bpPanel.classList.add('collapsed');
+            if (showBpTab) showBpTab.style.display = 'flex';
+          }
+        }
       });
     }
 
@@ -300,6 +316,13 @@ class GameApp {
       showBpTab.addEventListener('click', () => {
         bpPanel.classList.remove('collapsed');
         showBpTab.style.display = 'none';
+        // On mobile, collapse workbench when blueprint opens
+        if (window.innerWidth < 950 || window.innerHeight < 550) {
+          if (wbPanel) {
+            wbPanel.classList.add('collapsed');
+            if (showWbTab) showWbTab.style.display = 'flex';
+          }
+        }
       });
     }
 
@@ -478,6 +501,14 @@ class GameApp {
             const showWbTab = document.getElementById('show-workbench-tab');
             if (wbPanel) wbPanel.classList.remove('collapsed');
             if (showWbTab) showWbTab.style.display = 'none';
+
+            // On mobile, collapse blueprint when navigating to workbench
+            if (window.innerWidth < 950 || window.innerHeight < 550) {
+              const bpPanel = document.getElementById('blueprint-panel');
+              const showBpTab = document.getElementById('show-blueprint-tab');
+              if (bpPanel) bpPanel.classList.add('collapsed');
+              if (showBpTab) showBpTab.style.display = 'flex';
+            }
 
             // Navigate flow to step and update UI
             this.flow.goToStep(stepIdx);
