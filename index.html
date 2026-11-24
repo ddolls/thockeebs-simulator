@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThocKeebs: Mechanical Keyboard Simulator</title>
+  <link rel="stylesheet" href="./src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <script>
+    if (sessionStorage.getItem('thockeebs_has_loaded') === 'true') {
+      document.documentElement.classList.add('skip-loading');
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Fullscreen Cinematic Video Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-video-container">
+        <video id="loading-video" class="loading-video" autoplay muted loop playsinline preload="auto">
+          <source src="/Loading.mp4" type="video/mp4">
+        </video>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar-fill" id="loading-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app">
+    <!-- Top Nav / Control Bar -->
+    <header class="top-nav">
+      <div class="nav-brand">
+        <span class="logo-emoji">⌨️</span>
+        <div class="logo-text">
+          <h1>ThocKeebs</h1>
+          <span class="logo-sub">Mechanical Switches & Stabilizers Tuning</span>
+        </div>
+      </div>
+
+      <div class="nav-stats">
+        <div class="wallet-pill" id="wallet-pill">
+          <span class="wallet-icon">💰</span>
+          <span class="wallet-label">Budget:</span>
+          <span class="wallet-value" id="coins-display">$500</span>
+        </div>
+        <button class="nav-btn shop-btn" id="open-shop-btn">
+          🛒Toko
+        </button>
+      </div>
+    </header>
+
+    <!-- Main 3D Canvas Area -->
+    <main class="main-viewport">
+      <div id="webgl-container"></div>
+
+      <!-- Left Interactive Workbench Steps Panel -->
+      <aside class="workbench-panel glass-card collapsed" id="workbench-panel">
+        <div class="step-header">
+          <div class="step-badge-row">
+            <div class="step-badge" id="step-badge">STEP 1 / 7</div>
+            <button class="panel-collapse-btn" id="hide-workbench-btn" title="Sembunyikan Menu Rakit">✕</button>
+          </div>
+          <h2 class="step-title" id="step-title">Case & Chassis Preparation</h2>
+        </div>
+        <p class="step-desc" id="step-desc">Pilih layout keyboard dan bahan casing sesuai pesanan customer.</p>
+
+        <!-- Dynamic Step Control Options -->
+        <div class="step-options-container" id="step-options-container">
+          <!-- Populated dynamically by main.js based on current step -->
+        </div>
+
+        <!-- Step Navigation Buttons -->
+        <div class="step-nav-footer">
+          <button class="btn btn-secondary" id="prev-step-btn" disabled>⬅ Sebelumnya</button>
+          <button class="btn btn-primary" id="next-step-btn">Lanjut Step 2 ➔</button>
+        </div>
+      </aside>
+
+      <!-- Floating Open Tabs (Shown when panels are hidden) -->
+      <button class="panel-toggle-tab left-tab" id="show-workbench-tab" style="display: none;">
+        <span>Menu Rakit</span>
+      </button>
+
+      <button class="panel-toggle-tab right-tab" id="show-blueprint-tab" style="display: none;">
+        <span>Blueprint Pesanan</span>
+      </button>
+
+      <!-- Customer Arrival Dialogue Bubble (Overlay above counter) -->
+      <div class="customer-dialogue-bubble glass-card" id="customer-dialogue-bubble" style="display: none;">
+        <div class="bubble-header">
+          <span class="bubble-tag">Pelanggan Tiba</span>
+          <h3 class="bubble-customer-name" id="bubble-cust-name">Boba si Programmer WFH</h3>
+        </div>
+        <p class="bubble-dialogue-text" id="bubble-cust-text">
+          “Halo om juragan! Tolong rakitin custom keyboard impian gue dong, speknya udah gue siapin di samping!”
+        </p>
+        <div class="bubble-actions">
+          <button class="btn btn-primary" id="bubble-accept-btn">Mulai Rakit Keyboard Pesanan!</button>
+        </div>
+      </div>
+
+      <!-- Persistent Right-Side Blueprint Specs Panel -->
+      <aside class="blueprint-panel glass-card collapsed" id="blueprint-panel">
+        <!-- Rendered dynamically and kept persistent at all times -->
+      </aside>
+
+      <!-- Bottom Typing Test Interactive Banner (Active during Step 7) -->
+      <div class="typing-banner glass-card" id="typing-banner" style="display: none;">
+        <div class="typing-header">
+          <span class="typing-icon">⚡</span>
+          <span class="typing-title">ASMR Acoustic Typing Test</span>
+          <span class="typing-hint">Ketik tombol di keyboard fisikmu atau klik tombol di layar!</span>
+        </div>
+        <div class="typing-display-box" id="typing-display-box">
+          <span class="typing-placeholder">Mulai mengetik di sini untuk mendengar suara switches...</span>
+        </div>
+        <div class="typing-stats-row">
+          <div class="t-stat">Switch: <strong id="t-switch-name">Gateron Milky Yellow Pro</strong></div>
+          <div class="t-stat">Plate: <strong id="t-plate-name">POM Plate</strong></div>
+          <div class="t-stat">Dampening: <strong id="t-damp-count">4 Layers</strong></div>
+          <button class="btn btn-accent btn-sm" id="handover-btn">Serahkan Pesanan!</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Supplier Store Modal (Shop) -->
+    <div class="modal-overlay" id="shop-modal" style="display: none;">
+      <div class="modal-content shop-modal-content glass-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">🛒</span>
+            <h2>Toko</h2>
+          </div>
+          <button class="close-modal-btn" id="close-shop-btn">✕</button>
+        </div>
+        <p class="modal-subtitle">Belanja stok sparepart keyboard custom untuk memenuhi pesanan pelanggan.</p>
+
+        <!-- Shop Body (Sidebar on Left, Items Grid on Right) -->
+        <div class="shop-body-layout">
+          <aside class="shop-sidebar">
+            <div class="shop-sidebar-title">Kategori Part:</div>
+            <div class="shop-tabs" id="shop-tabs">
+              <button class="shop-tab active" data-cat="cases">Casing</button>
+              <button class="shop-tab" data-cat="pcbs">PCB</button>
+              <button class="shop-tab" data-cat="dampeners">Dampening (7 Layers)</button>
+              <button class="shop-tab" data-cat="plates">Plates</button>
+              <button class="shop-tab" data-cat="stabilizers">Stabilizers</button>
+              <button class="shop-tab" data-cat="switches">Switches</button>
+              <button class="shop-tab" data-cat="keycaps">Keycaps</button>
+              <button class="shop-tab" data-cat="artisans">Artisan ESC</button>
+              <button class="shop-tab" data-cat="cables">Kabel Aviator</button>
+              <button class="shop-tab" data-cat="addons">Addon (Knob & Screen)</button>
+            </div>
+          </aside>
+
+          <!-- Shop Items Grid Area -->
+          <div class="shop-grid-wrap">
+            <div class="shop-grid" id="shop-grid">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Handover Order Success Modal -->
+    <div class="modal-overlay" id="handover-modal" style="display: none;">
+      <div class="modal-content glass-card result-modal">
+        <div class="result-badge-wrap">
+          <div class="result-rank-badge" id="result-rank">SSS</div>
+        </div>
+        <h2 id="result-title">Hasil Rakitan Sempurna!</h2>
+        <p id="result-subtitle">Customer sangat terkesima dengan suara dan estetika keyboard ini!</p>
+
+        <div class="result-details-box" id="result-details-box">
+          <!-- Checklist validation rows -->
+        </div>
+
+        <div class="result-payout-row">
+          <div class="payout-item">
+            <span class="p-label">Total Pembayaran:</span>
+            <span class="p-val" id="result-total-payout">+$180</span>
+          </div>
+          <div class="payout-item">
+            <span class="p-label">Bonus Tip:</span>
+            <span class="p-val highlight" id="result-tip">+$50</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="next-customer-btn">🐾 Sambut Customer Berikutnya!</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
