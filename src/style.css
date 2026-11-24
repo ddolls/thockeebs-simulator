@@ -1400,3 +1400,529 @@ html.skip-loading #loading-screen {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ==========================================================================
+   Mobile Orientation Lock Overlay (Forced Landscape Mode)
+   ========================================================================== */
+.orientation-lock-overlay {
+  display: none;
+}
+
+@media screen and (orientation: portrait) and (max-width: 1024px) {
+  .orientation-lock-overlay {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: #18181b;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    box-sizing: border-box;
+    color: #f0f0f1;
+    user-select: none;
+  }
+}
+
+.orientation-box {
+  background: #2e2e2f;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+}
+
+.phone-rotate-anim {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-icon {
+  width: 48px;
+  height: 48px;
+  animation: rotatePhone 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.rotate-arrow {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 22px;
+  color: #ffffff;
+  font-weight: 800;
+  animation: pulseArrow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes rotatePhone {
+  0%, 15% {
+    transform: rotate(0deg);
+  }
+  45%, 75% {
+    transform: rotate(90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulseArrow {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+.orientation-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.orientation-desc {
+  font-size: 12px;
+  color: #bcbcbd;
+  line-height: 1.5;
+}
+
+.orientation-btn {
+  width: 100%;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18181b;
+  margin-top: 4px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.orientation-btn:hover {
+  background: #e4e4e7;
+  transform: translateY(-1px);
+}
+
+.orientation-hint {
+  font-size: 10.5px;
+  color: #71717a;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Mobile Landscape Responsive Adjustments & Touch Controls
+   ========================================================================== */
+html, body, #app {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
+#webgl-container {
+  touch-action: none;
+}
+
+@media screen and (max-height: 540px), screen and (max-width: 950px) and (orientation: landscape) {
+  /* Safe-area insets for notched phones */
+  .top-nav {
+    height: 42px;
+    padding: 0 max(12px, env(safe-area-inset-right, 12px)) 0 max(12px, env(safe-area-inset-left, 12px));
+  }
+
+  .logo-emoji {
+    font-size: 18px;
+  }
+
+  .logo-text h1 {
+    font-size: 13px;
+    letter-spacing: -0.2px;
+  }
+
+  .logo-sub {
+    display: none;
+  }
+
+  .nav-stats {
+    gap: 8px;
+  }
+
+  .wallet-pill {
+    padding: 3px 8px;
+    gap: 5px;
+  }
+
+  .wallet-icon {
+    font-size: 12px;
+  }
+
+  .wallet-label {
+    display: none;
+  }
+
+  .wallet-value {
+    font-size: 12px;
+  }
+
+  .nav-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  /* Left Workbench Panel */
+  .workbench-panel {
+    top: 6px;
+    left: max(6px, env(safe-area-inset-left, 6px));
+    width: min(285px, 42vw);
+    max-height: calc(100vh - 54px);
+    padding: 10px 12px;
+    border-radius: 10px;
+    z-index: 20;
+  }
+
+  .step-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .panel-collapse-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+
+  .step-title {
+    font-size: 12.5px;
+    line-height: 1.25;
+    margin-top: 3px;
+  }
+
+  .step-desc {
+    font-size: 10.5px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .step-options-container {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .option-group-label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .option-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 5px;
+  }
+
+  .opt-card {
+    padding: 6px;
+    border-radius: 6px;
+  }
+
+  .opt-title {
+    font-size: 10.5px;
+  }
+
+  .opt-sub {
+    font-size: 8.5px;
+  }
+
+  .opt-stock {
+    font-size: 8px;
+    padding: 1px 4px;
+  }
+
+  .step-nav-footer {
+    padding-top: 6px;
+    gap: 6px;
+  }
+
+  .btn {
+    padding: 7px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  /* Right Blueprint Panel */
+  .blueprint-panel {
+    top: 6px;
+    right: max(6px, env(safe-area-inset-right, 6px));
+    width: min(280px, 40vw);
+    max-height: calc(100vh - 54px);
+    border-radius: 10px;
+    z-index: 20;
+  }
+
+  .blueprint-header {
+    padding: 8px 12px 6px 12px;
+    gap: 8px;
+  }
+
+  .blueprint-customer-name {
+    font-size: 12px;
+  }
+
+  .blueprint-tag {
+    font-size: 8.5px;
+  }
+
+  .blueprint-scroll-body {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .customer-quote-box {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .spec-row {
+    padding: 4px 6px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .spec-val {
+    max-width: 65%;
+    font-size: 10px;
+  }
+
+  .blueprint-pinned-footer {
+    padding: 8px 10px 10px 10px;
+    gap: 6px;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .buy-quest-parts-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .payout-amt {
+    font-size: 12px;
+  }
+
+  .accuracy-pill {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  /* Floating Panel Toggle Tabs */
+  .panel-toggle-tab {
+    top: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .panel-toggle-tab.left-tab {
+    left: max(6px, env(safe-area-inset-left, 6px));
+  }
+
+  .panel-toggle-tab.right-tab {
+    right: max(6px, env(safe-area-inset-right, 6px));
+  }
+
+  /* Customer Arrival Dialogue Bubble */
+  .customer-dialogue-bubble {
+    top: 5%;
+    width: min(420px, 86vw);
+    padding: 12px 14px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .bubble-customer-name {
+    font-size: 12px;
+  }
+
+  .bubble-dialogue-text {
+    font-size: 11px;
+    padding: 8px 10px;
+    line-height: 1.35;
+  }
+
+  .bubble-actions .btn {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+
+  /* Shop Modal */
+  .shop-modal-content {
+    width: 96vw;
+    max-height: 94vh;
+    padding: 12px 14px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .modal-header h2 {
+    font-size: 14px;
+  }
+
+  .modal-subtitle {
+    display: none;
+  }
+
+  .shop-body-layout {
+    gap: 10px;
+  }
+
+  .shop-sidebar {
+    width: 120px;
+    padding-right: 6px;
+    gap: 4px;
+  }
+
+  .shop-sidebar-title {
+    font-size: 9px;
+  }
+
+  .shop-tabs {
+    max-height: 68vh;
+    gap: 3px;
+  }
+
+  .shop-tab {
+    padding: 5px 7px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+
+  .shop-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 6px;
+    max-height: 68vh;
+  }
+
+  .shop-card {
+    padding: 6px;
+    border-radius: 6px;
+    gap: 4px;
+  }
+
+  .shop-card-name {
+    font-size: 11px;
+  }
+
+  .shop-card-desc {
+    font-size: 9px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .shop-price {
+    font-size: 11px;
+  }
+
+  .shop-buy-btn {
+    padding: 4px 8px;
+    font-size: 9.5px;
+    border-radius: 5px;
+  }
+
+  /* Handover Result Modal */
+  .result-modal {
+    width: min(380px, 92vw);
+    max-height: 94vh;
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .result-rank-badge {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  #result-title {
+    font-size: 14px;
+  }
+
+  #result-subtitle {
+    font-size: 10.5px;
+  }
+
+  .result-details-box {
+    max-height: 90px;
+    padding: 6px;
+    font-size: 10px;
+  }
+
+  .result-payout-row {
+    gap: 10px;
+  }
+
+  .p-val {
+    font-size: 15px;
+  }
+
+  #next-customer-btn {
+    padding: 8px 12px;
+    font-size: 11.5px;
+  }
+
+  /* Typing Banner */
+  .typing-banner {
+    bottom: 6px;
+    width: min(540px, 94vw);
+    padding: 8px 12px;
+    gap: 5px;
+    border-radius: 8px;
+  }
+
+  .typing-title {
+    font-size: 11px;
+  }
+
+  .typing-hint {
+    display: none;
+  }
+
+  .typing-display-box {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+
+  .typing-stats-row {
+    font-size: 10px;
+    gap: 8px;
+  }
+
+  .typing-stats-row button {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  /* Video loading screen on mobile landscape */
+  .loading-video-container {
+    width: min(320px, 72vw);
+  }
+
+  .loading-bar-wrap {
+    width: 190px;
+    height: 3px;
+    bottom: 24%;
+  }
+}

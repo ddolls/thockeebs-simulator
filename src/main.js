@@ -87,6 +87,7 @@ class GameApp {
 
     this.initUI();
     this.initInputListeners();
+    this.initOrientationLock();
 
     // Start 3D Render Loop
     this.sceneManager.start();
@@ -97,6 +98,42 @@ class GameApp {
 
     // Cinematic Video Loading Screen (Customer arrival will be shown once loaded)
     this.initLoadingScreen();
+  }
+
+  initOrientationLock() {
+    const forceBtn = document.getElementById('force-landscape-btn');
+    const tryLockLandscape = async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen().catch(() => {});
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          await document.documentElement.webkitRequestFullscreen().catch(() => {});
+        }
+      } catch (e) {}
+
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (e) {}
+
+      setTimeout(() => {
+        if (this.sceneManager) this.sceneManager.onWindowResize();
+      }, 200);
+    };
+
+    if (forceBtn) {
+      forceBtn.addEventListener('click', tryLockLandscape);
+    }
+
+    // Try auto-locking on first touch/interaction on mobile
+    const onFirstTouch = () => {
+      tryLockLandscape();
+      window.removeEventListener('touchstart', onFirstTouch);
+      window.removeEventListener('pointerdown', onFirstTouch);
+    };
+    window.addEventListener('touchstart', onFirstTouch, { passive: true, once: true });
+    window.addEventListener('pointerdown', onFirstTouch, { passive: true, once: true });
   }
 
   initLoadingScreen() {

@@ -3,7 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="screen-orientation" content="landscape">
   <title>ThocKeebs: Mechanical Keyboard Simulator</title>
   <link rel="stylesheet" href="./src/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +34,28 @@
           <div class="loading-bar-fill" id="loading-bar-fill"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Forced Landscape Mode Blocker Overlay for Mobile/Tablets -->
+  <div id="orientation-lock-overlay" class="orientation-lock-overlay">
+    <div class="orientation-box">
+      <div class="phone-rotate-anim">
+        <svg class="phone-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="6" width="20" height="36" rx="4" stroke="#ffffff" stroke-width="2.5" />
+          <line x1="21" y1="38" x2="27" y2="38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="24" cy="11" r="1.5" fill="#ffffff" />
+        </svg>
+        <span class="rotate-arrow">↻</span>
+      </div>
+      <h2 class="orientation-title">Putar Layar ke Landscape</h2>
+      <p class="orientation-desc">
+        Game <strong>ThocKeebs Simulator</strong> membutuhkan orientasi horizontal (landscape) agar seluruh meja perakitan keyboard dapat ditampilkan secara optimal.
+      </p>
+      <button id="force-landscape-btn" class="btn btn-primary orientation-btn">
+        Mulai Mode Landscape 🔄
+      </button>
+      <span class="orientation-hint">Tips: Pastikan fitur "Kunci Rotasi / Auto-Rotate" di HP Anda sudah aktif lalu miringkan ponsel Anda.</span>
     </div>
   </div>
 

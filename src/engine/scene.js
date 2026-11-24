@@ -65,8 +65,12 @@ export class SceneManager {
     // 5. Updatables list
     this.updatables = [];
 
-    // 6. Window resize handler
+    // 6. Window resize & orientation change handlers
     window.addEventListener('resize', () => this.onWindowResize());
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this.onWindowResize(), 150);
+      setTimeout(() => this.onWindowResize(), 400);
+    });
   }
 
   setupLighting() {
