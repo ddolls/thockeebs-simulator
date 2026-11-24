@@ -332,6 +332,12 @@ html.skip-loading #loading-screen {
   background: rgba(255, 255, 255, 0.12);
 }
 
+.audio-btn.active {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
 /* Main Viewport & 3D Container */
 .main-viewport {
   position: relative;

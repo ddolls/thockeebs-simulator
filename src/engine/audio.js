@@ -30,7 +30,7 @@ class AudioManager {
     this.sfxGain.connect(this.masterGain);
 
     this.musicGain = this.ctx.createGain();
-    this.musicGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+    this.musicGain.gain.setValueAtTime(0.55, this.ctx.currentTime);
     this.musicGain.connect(this.masterGain);
 
     this._generateNoiseBuffer();
@@ -651,53 +651,109 @@ class AudioManager {
     }
   }
 
-  // Lo-Fi Procedural Ambient Music Player (Warm Rhodes electric piano chords)
+  // Lo-Fi Procedural Ambient Music Player (Warm Rhodes electric piano chords + Deep Bass)
   startLoFiMusic() {
     if (this.isMusicPlaying) return;
     this.ensureContext();
     this.isMusicPlaying = true;
 
-    // Chord progressions in C Major 7th / A Minor 9th
+    // Rich Lo-Fi Jazz Progressions: Cmaj9 -> Am9 -> Fmaj7(#11) -> G9/G13 (Warm, dreamy & chill)
     const progressions = [
-      [261.63, 329.63, 392.00, 493.88], // Cmaj7
-      [220.00, 261.63, 329.63, 392.00], // Am7
-      [174.61, 220.00, 261.63, 329.63], // Fmaj7
-      [196.00, 246.94, 293.66, 349.23]  // G7
+      {
+        root: 130.81, // C3
+        chord: [261.63, 329.63, 392.00, 493.88, 587.33] // C4, E4, G4, B4, D5 (Cmaj9)
+      },
+      {
+        root: 110.00, // A2
+        chord: [220.00, 261.63, 329.63, 392.00, 493.88] // A3, C4, E4, G4, B4 (Am9)
+      },
+      {
+        root: 87.31,  // F2
+        chord: [174.61, 220.00, 261.63, 329.63, 369.99] // F3, A3, C4, E4, F#4 (Fmaj7#11)
+      },
+      {
+        root: 98.00,  // G2
+        chord: [196.00, 246.94, 293.66, 349.23, 440.00] // G3, B3, D4, F4, A4 (G9)
+      }
     ];
 
     let chordIdx = 0;
     const playNextChord = () => {
       if (!this.isMusicPlaying || !this.ctx || this.isMuted) return;
       const now = this.ctx.currentTime;
-      const chord = progressions[chordIdx % progressions.length];
+      const { root, chord } = progressions[chordIdx % progressions.length];
       chordIdx++;
 
+      // 1. Warm Electric Bass Root Note
+      const bassOsc = this.ctx.createOscillator();
+      const bassGain = this.ctx.createGain();
+      const bassFilter = this.ctx.createBiquadFilter();
+
+      bassFilter.type = 'lowpass';
+      bassFilter.frequency.setValueAtTime(450, now);
+
+      bassOsc.type = 'triangle';
+      bassOsc.frequency.setValueAtTime(root, now);
+
+      bassGain.gain.setValueAtTime(0.001, now);
+      bassGain.gain.linearRampToValueAtTime(0.35, now + 0.15);
+      bassGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+
+      bassOsc.connect(bassFilter);
+      bassFilter.connect(bassGain);
+      bassGain.connect(this.musicGain);
+
+      bassOsc.start(now);
+      bassOsc.stop(now + 3.4);
+
+      // 2. Lush Rhodes E-Piano Chords (Strummed with slight voice delays & vintage chorus detune)
       chord.forEach((freq, noteIdx) => {
-        const osc = this.ctx.createOscillator();
+        const noteTime = now + noteIdx * 0.045; // Gentle guitar/piano strum feel
+
+        // Primary body oscillator (Triangle)
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator(); // Detuned shimmer for Rhodes vibrato chorus
         const gain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(800, now);
+        // Warm 1600Hz envelope opening slightly for piano hammer clarity
+        filter.frequency.setValueAtTime(1400, noteTime);
+        filter.frequency.linearRampToValueAtTime(1800, noteTime + 0.1);
+        filter.frequency.exponentialRampToValueAtTime(750, noteTime + 3.0);
+        filter.Q.setValueAtTime(1.2, noteTime);
 
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + noteIdx * 0.05);
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq, noteTime);
 
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.06, now + 0.4);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.4);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 1.0025, noteTime); // Subtle 4-cent vintage chorus detune
 
-        osc.connect(filter);
+        gain.gain.setValueAtTime(0.001, noteTime);
+        gain.gain.linearRampToValueAtTime(0.22, noteTime + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 3.3);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
         filter.connect(gain);
         gain.connect(this.musicGain);
 
-        osc.start(now + noteIdx * 0.05);
-        osc.stop(now + 3.6);
+        osc1.start(noteTime);
+        osc2.start(noteTime);
+        osc1.stop(noteTime + 3.5);
+        osc2.stop(noteTime + 3.5);
       });
     };
 
     playNextChord();
     this.musicInterval = setInterval(playNextChord, 3600);
+  }
+
+  setMusicVolume(vol) {
+    if (this.musicGain && this.ctx) {
+      const clamped = Math.max(0, Math.min(1.0, vol));
+      this.musicGain.gain.setValueAtTime(clamped, this.ctx.currentTime);
+    }
   }
 
   stopLoFiMusic() {

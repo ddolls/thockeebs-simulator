@@ -327,10 +327,15 @@ class GameApp {
     }
 
     // 2. Audio initialization (Lo-Fi music and SFX ON by default, starts on first user touch/click/press)
+    const lofiBtn = document.getElementById('toggle-lofi-btn');
     const startAudioOnFirstInteraction = () => {
       audioManager.ensureContext();
       if (!audioManager.isMusicPlaying) {
         audioManager.startLoFiMusic();
+        if (lofiBtn) {
+          lofiBtn.textContent = '🎵 Lo-Fi: ON';
+          lofiBtn.classList.add('active');
+        }
       }
       window.removeEventListener('pointerdown', startAudioOnFirstInteraction);
       window.removeEventListener('keydown', startAudioOnFirstInteraction);
@@ -338,15 +343,18 @@ class GameApp {
     window.addEventListener('pointerdown', startAudioOnFirstInteraction);
     window.addEventListener('keydown', startAudioOnFirstInteraction);
 
-    const lofiBtn = document.getElementById('toggle-lofi-btn');
     if (lofiBtn) {
-      lofiBtn.addEventListener('click', () => {
+      lofiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        audioManager.ensureContext();
         if (audioManager.isMusicPlaying) {
           audioManager.stopLoFiMusic();
-          lofiBtn.textContent = 'Lo-Fi: OFF';
+          lofiBtn.textContent = '🔇 Lo-Fi: OFF';
+          lofiBtn.classList.remove('active');
         } else {
           audioManager.startLoFiMusic();
-          lofiBtn.textContent = 'Lo-Fi: ON';
+          lofiBtn.textContent = '🎵 Lo-Fi: ON';
+          lofiBtn.classList.add('active');
         }
       });
     }
